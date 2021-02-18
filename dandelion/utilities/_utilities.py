@@ -2,7 +2,7 @@
 # @Author: kt16
 # @Date:   2020-05-12 14:01:32
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2020-12-30 01:53:19
+# @Last Modified time: 2021-02-18 23:53:56
 
 import sys
 import os
@@ -626,9 +626,9 @@ def update_metadata(self, retrieve = None, isotype_dict = None, split_heavy_ligh
             except:
                 lv_ = self.metadata.at[i, 'v_call_light']
             try:
-                lj_ = self.metadata.at[i, 'v_call_light'].split('|')
+                lj_ = self.metadata.at[i, 'j_call_light'].split('|')
             except:
-                lv_ = self.metadata.at[i, 'v_call_light']
+                lj_ = self.metadata.at[i, 'j_call_light']
             multi_ = []
             if len(hv_) > 1:
                 multi_.append(['Multi_heavy_v'])
