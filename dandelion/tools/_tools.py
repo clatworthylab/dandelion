@@ -2,7 +2,7 @@
 # @Author: Kelvin
 # @Date:   2020-05-13 23:22:18
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2020-12-30 01:51:38
+# @Last Modified time: 2021-02-21 13:35:24
 
 import os
 import sys
@@ -520,6 +520,26 @@ def find_clones(self, identity=0.85, clustering_by = None, by_alleles = None, ke
                     for key, value in clone_dict_light.items():
                         renamed_clone_dict_light[key] = lclones_dict[value]
                     dat.at[renamed_clone_dict_light.keys(), clone_key] = dat.loc[renamed_clone_dict_light.keys(), clone_key] + '_' + pd.Series(renamed_clone_dict_light)
+
+    # finish up the assignment
+    finish = Tree()
+    for x,y,z in zip(dat['cell_id'], dat['sequence_id'], dat[clone_key]):
+        finish[x][y][z].value = 1
+    allclones = {}
+    for x in finish:
+        clones = []
+        for y in finish[x]:
+            clones.append(list(finish[x][y])[0])
+        if 3 > len(list(set(clones))) > 1:
+            clones = sorted(clones)
+            if clones[0] == clones[1].rsplit('_',1)[0]:
+                clones = [clones[1]]
+        elif len(list(set(clones))) > 2:
+            clones = sorted(list(set(clones)))[1:]
+        
+        for y in finish[x]:
+            allclones[y] = '|'.join(sorted(list(set(clones))))
+    dat[clone_key] = pd.Series(allclones)
 
     if os.path.isfile(str(self)):
         dat.to_csv("{}/{}_clone.tsv".format(os.path.dirname(self), os.path.basename(self).split('.tsv')[0]), sep = '\t', index = False)
