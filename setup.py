@@ -14,7 +14,7 @@ setup(
     description="sc-BCR analysis tool",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url=["https://github.com/clatworthylab/dandelion/", "https://github.com/zktuong/dandelion/"],
+    url="https://github.com/zktuong/dandelion/",
     packages=find_packages(),
     setup_requires=['setuptools_scm'],
     install_requires=requirements,
