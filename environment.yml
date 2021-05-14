@@ -17,6 +17,7 @@ dependencies:
 - pytest
 - blast
 - igblast
+- pip
 - tbb
 - pip:
   - nbsphinx

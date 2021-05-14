@@ -1,0 +1,34 @@
+Bootstrap: docker
+
+From: continuumio/miniconda3
+
+%files
+    ncbi-blast-2.10.1+ /share/ncbi-blast-2.10.1+
+    ncbi-igblast-1.15.0 /share/ncbi-igblast-1.15.0
+    database /share/database
+    environment.yml /environment.yml
+
+%post
+    apt-get -y update
+    apt-get install -y libopenblas-dev r-base-core libcurl4-openssl-dev libopenmpi-dev openmpi-bin openmpi-common openmpi-doc openssh-client openssh-server libssh-dev wget vim git nano git cmake  gfortran g++ curl wget autoconf bzip2 libtool libtool-bin
+
+    # Install required R packages
+    R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
+    R --slave -e 'BiocManager::install(c("Biostrings", "GenomicAlignments", "IRanges"))'
+    R --slave -e 'install.packages(c("optparse", "alakazam", "tigger", "airr", "shazam"), repos="https://cloud.r-project.org/")'
+    . /opt/conda/etc/profile.d/conda.sh
+    conda env update --name dandelion -f environment.yml
+    echo ". /opt/conda/etc/profile.d/conda.sh" >> $SINGULARITY_ENVIRONMENT
+    echo "conda activate dandelion" >> $SINGULARITY_ENVIRONMENT
+
+%environment
+    export GERMLINE=/share/database/germlines/
+    export IGDATA=/share/database/igblast/
+    export BLASTDB=/share/database/blast/
+    export PATH=/share/ncbi-igblast-1.15.0/bin:$PATH
+    export PATH=/share/ncbi-blast-2.10.1+/bin:$PATH
+
+%test
+    ls /share
+    which blastn
+    conda list

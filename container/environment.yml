@@ -1,0 +1,21 @@
+name: dandelion
+channels:
+- conda-forge
+- bioconda
+- anaconda
+- defaults
+dependencies:
+- python=3.8
+- seaborn
+- scikit-learn
+- statsmodels
+- numba
+- pytables
+- python-igraph
+- leidenalg
+- pip
+- tbb
+- pip:
+  - scanpy==1.7.0
+  - sc-dandelion==0.1.0
+  - rpy2==3.4.4

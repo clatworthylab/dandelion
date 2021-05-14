@@ -2,7 +2,7 @@
 # @Author: Kelvin
 # @Date:   2020-08-13 21:08:53
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-02-20 09:37:51
+# @Last Modified time: 2021-04-01 10:01:56
 
 import pandas as pd
 import numpy as np
@@ -182,7 +182,7 @@ def clone_networkstats(self: Dandelion, expanded_only: bool = False, network_clu
             G.add_weighted_edges_from(
                 zip(list(self.metadata.index), list(self.metadata.index), A.data))
 
-        if len(G) is 0:
+        if len(G) == 0:
             raise AttributeError(
                 'Graph not found. Plase run tl.generate_network.')
         else:

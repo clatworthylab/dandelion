@@ -2,7 +2,7 @@
 # @Author: kt16
 # @Date:   2020-05-12 14:01:32
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-03-30 17:14:26
+# @Last Modified time: 2021-04-03 11:55:58
 
 import os
 import pandas as pd
@@ -280,7 +280,7 @@ def from_scirpy(adata: AnnData, clone_key: Union[None, str] = None, key_added: U
     adata : AnnData
         `scirpy` initialized `AnnData` object.
     clone_key : str, optional
-        column name for `clone_id` in `AnnData`. None defaults to `clonotype` in `scirpy` initialized object.
+        column name for `clone_id` in `AnnData`. None defaults to `clone_id` in `scirpy` initialized object.
     key_added : str, optional
         column name for `clone_id` in `Dandelion`. None defaults to `clone_id` in `dandelion` initialized object.
     mapping_mode : str
@@ -297,7 +297,7 @@ def from_scirpy(adata: AnnData, clone_key: Union[None, str] = None, key_added: U
         raise ImportError('Please install scirpy. pip install scirpy')
 
     if clone_key is None:
-        clonekey_s = 'clonotype'
+        clonekey_s = 'clone_id'
     else:
         clonekey_s = clone_key
 
@@ -306,35 +306,4 @@ def from_scirpy(adata: AnnData, clone_key: Union[None, str] = None, key_added: U
     else:
         clonekey_d = key_added
 
-    airr_cells = ir.io.to_ir_objs(adata)
-    tmp_ = ir.io.to_dandelion(adata)
-    tmp = tmp_.data.copy()
-
-    if clonekey_d in adata.obs:
-        cell_clonotype_dict = dict(zip(adata.obs.index, adata.obs[clonekey_d]))
-    elif clonekey_s in adata.obs:
-        cell_clonotype_dict = dict(zip(adata.obs.index, adata.obs[clonekey_s]))
-    else:
-        cell_clonotype_dict = {}
-        for c in airr_cells:
-            clones_ = '|'.join([cx['clone_id'] if isinstance(
-                cx['clone_id'], str) else '' for cx in c.chains])
-            cell_clonotype_dict[c.cell_id] = clones_
-
-    if mapping_mode == 'cell':
-        tmp[clonekey_d] = [cell_clonotype_dict[x] for x in tmp['cell_id']]
-    elif mapping_mode == 'chain':
-        clone_dict = {}
-        for c in airr_cells:
-            for cx in c.chains:
-                clone_dict[cx['sequence_id']] = cx['clone_id']
-        if all(v == '' for v in clone_dict.values()) or all(pd.isnull(v) for v in clone_dict.values()):
-            clone_dict = {}
-            for c in airr_cells:
-                for cx in c.chains:
-                    clone_dict[cx['sequence_id']] = cell_clonotype_dict[c.cell_id]
-        tmp[clonekey_d] = [clone_dict[x] for x in tmp['sequence_id']]
-
-    tmp_.__init__(data=tmp)
-
-    return(tmp_)
+    return(ir.io.to_dandelion(adata))

@@ -33,13 +33,24 @@ conda activate dandelion
 ```
 
 First, install [scanpy](https://scanpy.readthedocs.io/en/latest/installation.html).
+```bash
+# from scanpy's website
+conda install seaborn scikit-learn statsmodels numba pytables
+conda install -c conda-forge python-igraph leidenalg
+pip install scanpy
+```
 
 ```bash
 # these are required by dandelion
 conda install -c conda-forge distance joblib plotnine adjustText
 conda install -c bioconda igblast blast # if this doesn't work, download them manually (see below)
-conda install -c conda-forge "rpy2>=3.4" # to make compatible for R version 4
-# or pip install rpy2>=3.4
+
+# installing rpy2
+# if you just want to stick with the base R
+pip install "rpy2>=3.4"
+# or if you don't mind having conda manage R:
+conda install -c conda-forge "rpy2>=3.4"
+# make sure not to use the same R package folder or you will end up with major issues later.
 
 # Use pip to install the following with --no-cache-dir --upgrade if necessary
 # and then lastly install this
@@ -80,6 +91,8 @@ echo 'export IGDATA=~/Documents/dandelion/database/igblast/' >> ~/.bash_profile 
 echo 'export BLASTDB=~/Documents/dandelion/database/blast/' >> ~/.bash_profile # or ~/.zshenv
 source ~/.bash_profile # or ~/.zshenv
 ```
+see https://github.com/zktuong/dandelion/issues/66 for a known issue if you are using a notebook via jupyterhub.
+
 
 ## External softwares
 While blast and igblast executables are managed through conda, you can also download [igblast](https://ftp.ncbi.nih.gov/blast/executables/igblast/release/LATEST/) and [blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) manually, and store the softwares somewhere accessible. Just make sure to set the paths to them appropriately.
