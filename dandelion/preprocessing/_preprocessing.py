@@ -2,7 +2,7 @@
 # @Author: kt16
 # @Date:   2020-05-12 17:56:02
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-05-14 12:57:43
+# @Last Modified time: 2021-05-15 10:51:43
 
 import sys
 import os
@@ -237,7 +237,7 @@ def format_fastas(fastas: Sequence, prefix: Union[None, Sequence] = None, suffix
                              remove_trailing_hyphen_number=remove_trailing_hyphen_number, outdir=outdir)
 
 
-def assign_isotype(fasta: Union[str, PathLike], fileformat: Literal['blast', 'changeo', 'airr'] = 'blast', org: Literal['human', 'mouse'] = 'human', correct_c_call: bool = True, correction_dict: Union[Dict, None] = None, plot: bool = True, save_plot: Union[str, PathLike, None] = None, figsize: Tuple[Union[int, float], Union[int, float]] = (4, 4), blastdb: Union[None, str] = None, allele: bool = False, parallel: bool = True, ncpu: Union[None, int] = None, verbose: bool = False):
+def assign_isotype(fasta: Union[str, PathLike], fileformat: Literal['blast', 'changeo', 'airr'] = 'blast', org: Literal['human', 'mouse'] = 'human', correct_c_call: bool = True, correction_dict: Union[Dict, None] = None, plot: bool = True, save_plot: bool = False, figsize: Tuple[Union[int, float], Union[int, float]] = (4, 4), blastdb: Union[None, str] = None, allele: bool = False, parallel: bool = True, ncpu: Union[None, int] = None, verbose: bool = False):
     """
     Annotate contigs with constant region call using blastn
 
@@ -255,8 +255,8 @@ def assign_isotype(fasta: Union[str, PathLike], fileformat: Literal['blast', 'ch
         a nested dictionary contain isotype/c_genes as keys and primer sequences as records to use for correcting annotated c_calls. Defaults to a curated dictionary for human sequences if left as none.
     plot : bool
         whether or not to plot reassignment summary metrics. Default is True.
-    save_plot : str, PathLike, optional
-        file name for pdf of reassignment summary metrics plots. Default is None (does not save).
+    save_plot : bool
+        whether or not to save plot.
     figsize : Tuple[Union[int,float], Union[int,float]]
         size of figure. Default is (4, 4).
     blastdb : str, optional
@@ -759,13 +759,15 @@ def assign_isotype(fasta: Union[str, PathLike], fileformat: Literal['blast', 'ch
                  + geom_col(stat="identity", position='dodge')
                  + scale_fill_manual(values=('#79706e', '#86bcb6'))
                  + theme(legend_title=element_blank()))
-        if save_plot is not None:        
-            save_as_pdf_pages(p, file_name = save_plot)
+        if save_plot:
+            _file3 = "{}/assign_isotype.pdf".format(os.path.dirname(filePath))
+            save_as_pdf_pages([p], filename = _file3)
+            print(p)
         else:
             print(p)
 
 
-def assign_isotypes(fastas: Sequence, fileformat: Literal['blast', 'changeo', 'airr'] = 'blast', org: Literal['human', 'mouse'] = 'human', correct_c_call: bool = True, correction_dict: Union[None, Dict] = None, plot: bool = True, save_plot: Union[str, PathLike, None] = None, figsize: Tuple[Union[int, float], Union[int, float]] = (4, 4), blastdb: Union[None, str] = None, allele: bool = False, parallel: bool = True, ncpu: Union[None, int] = None, verbose: bool = False):
+def assign_isotypes(fastas: Sequence, fileformat: Literal['blast', 'changeo', 'airr'] = 'blast', org: Literal['human', 'mouse'] = 'human', correct_c_call: bool = True, correction_dict: Union[None, Dict] = None, plot: bool = True, save_plot: bool = False, figsize: Tuple[Union[int, float], Union[int, float]] = (4, 4), blastdb: Union[None, str] = None, allele: bool = False, parallel: bool = True, ncpu: Union[None, int] = None, verbose: bool = False):
     """
     Annotate contigs with constant region call using blastn
 
@@ -783,8 +785,8 @@ def assign_isotypes(fastas: Sequence, fileformat: Literal['blast', 'changeo', 'a
         a nested dictionary contain isotype/c_genes as keys and primer sequences as records to use for correcting annotated c_calls. Defaults to a curated dictionary for human sequences if left as none.
     plot : bool
         whether or not to plot reassignment summary metrics. Default is True.
-    save_plot : str, PathLike, optional
-        file name for pdf of reassignment summary metrics plots. Default is None (does not save).
+    save_plot : bool
+        whether or not to save plots.
     figsize : Tuple[Union[int,float], Union[int,float]]
         size of figure. Default is (4, 4).
     blastdb : str, optional
@@ -807,6 +809,7 @@ def assign_isotypes(fastas: Sequence, fileformat: Literal['blast', 'changeo', 'a
 
     if verbose:
         print('Assign isotypes \n')
+
     for fasta in fastas:
         assign_isotype(fasta, fileformat=fileformat, org=org, correct_c_call=correct_c_call, correction_dict=correction_dict,
                        plot=plot, save_plot=save_plot, figsize=figsize, blastdb=blastdb, allele=allele, parallel=parallel, ncpu=ncpu, verbose=verbose)
@@ -873,7 +876,7 @@ def reannotate_genes(data: Sequence, igblast_db: Union[None, str] = None, germli
                        extended=extended, verbose=verbose)
 
 
-def reassign_alleles(data: Sequence, combined_folder: Union[str, PathLike], v_germline: Union[None, str] = None, germline: Union[None, str, PathLike] = None, org: Literal['human', 'mouse'] = 'human', v_field: Literal['v_call', 'v_call_genotyped'] = 'v_call_genotyped', germ_types: Literal['full', 'dmask', 'vonly', 'regions'] = 'dmask', novel: bool = True, cloned: bool = False, plot: bool = True, save_plot: Union[str, PathLike, None] = None, figsize: Tuple[Union[int, float], Union[int, float]] = (4, 3), sample_id_dictionary: Union[None, Dict] = None, verbose: bool = False):
+def reassign_alleles(data: Sequence, combined_folder: Union[str, PathLike], v_germline: Union[None, str] = None, germline: Union[None, str, PathLike] = None, org: Literal['human', 'mouse'] = 'human', v_field: Literal['v_call', 'v_call_genotyped'] = 'v_call_genotyped', germ_types: Literal['full', 'dmask', 'vonly', 'regions'] = 'dmask', novel: bool = True, cloned: bool = False, plot: bool = True, save_plot: bool = False, figsize: Tuple[Union[int, float], Union[int, float]] = (4, 3), sample_id_dictionary: Union[None, Dict] = None, verbose: bool = False):
     """
     Correct allele calls based on a personalized genotype using tigger-reassignAlleles. It uses a subject-specific genotype to correct correct preliminary allele assignments of a set of sequences derived from a single subject.
 
@@ -899,8 +902,8 @@ def reassign_alleles(data: Sequence, combined_folder: Union[str, PathLike], v_ge
         whether or not to run CreateGermlines.py with `--cloned`.
     plot : bool
         whether or not to plot reassignment summary metrics. Default is True.
-    save_plot : str, PathLike, optional
-        file name for pdf of reassignment summary metrics plots. Default is None (does not save).
+    save_plot : bool
+        whether or not to save plot.
     figsize : Tuple[Union[int,float], Union[int,float]]
         size of figure. Default is (4, 3).
     sample_id_dictionary : dict, optional
@@ -1166,8 +1169,10 @@ def reassign_alleles(data: Sequence, combined_folder: Union[str, PathLike], v_ge
                      + facet_grid('~' + str('vgroup'), scales="free_y")
                      + scale_fill_manual(values=('#86bcb6', '#F28e2b'))
                      + theme(legend_title=element_blank()))
-                if save_plot is not None:
-                    save_as_pdf_pages(p, file_name = save_plot)
+                if save_plot:
+                    savefile = outDir + '/' + outDir + '_reassign_alleles.pdf'
+                    save_as_pdf_pages([p], filename = savefile)
+                    print(p)
                 else:
                     print(p)
             except:
