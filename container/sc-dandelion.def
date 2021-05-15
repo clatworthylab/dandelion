@@ -1,5 +1,5 @@
 Bootstrap: docker
-
+  
 From: continuumio/miniconda3
 
 %files
@@ -10,7 +10,7 @@ From: continuumio/miniconda3
 
 %post
     apt-get -y update
-    apt-get install -y libopenblas-dev r-base-core libcurl4-openssl-dev libopenmpi-dev openmpi-bin openmpi-common openmpi-doc openssh-client openssh-server libssh-dev wget vim git nano git cmake  gfortran g++ curl wget autoconf bzip2 libtool libtool-bin
+    apt-get install -y libopenblas-dev r-base-core libcurl4-openssl-dev libopenmpi-dev openmpi-bin openmpi-common libxml2-dev openmpi-doc openssh-client openssh-server libssh-dev wget vim git nano git cmake  gfortran g++ curl wget autoconf bzip2 libtool libtool-bin
 
     # Install required R packages
     R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'

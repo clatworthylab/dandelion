@@ -5,7 +5,6 @@ channels:
 - anaconda
 - defaults
 dependencies:
-- python=3.8
 - seaborn
 - scikit-learn
 - statsmodels
@@ -16,6 +15,6 @@ dependencies:
 - pip
 - tbb
 - pip:
-  - scanpy==1.7.0
-  - sc-dandelion==0.1.0
-  - rpy2==3.4.4
+  - scanpy>=1.7.0
+  - sc-dandelion>=0.1.0
+  - rpy2>=3.4.4
