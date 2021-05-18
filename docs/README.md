@@ -24,45 +24,56 @@ The raw files for the examples can be downloaded from 10X's Single Cell Immune P
 
 ## Installation
 
+### Singularity container
+
+`dandelion` now comes ready in the form of a singularity container:
+```bash
+singularity pull library://kt16/default/sc-dandelion:latest
+singularity shell sc-dandelion_latest.sif
+```
+This will load up a conda-environment that has all the required dependencies installed.
+This can be used for the preprocessing steps by navigating to the data folder and use:
+```bash
+singularity run -B $PWD sc-dandelion_latest.sif dandelion-preprocess
+```
+Please refer to the tutorial for more information.
+
+For more fine control, as well as for the exploration steps, please install via following the instructions below.
+
+### Manual
 I would reccomend installing this in order:
 ```bash
 # in bash/zsh terminal
 # create a conda environment with specific modules
-conda create --name dandelion python=3.7 # or 3.8
+conda create --name dandelion python=3.7 # or 3.8, 3.9
 conda activate dandelion
 ```
 
-First, install [scanpy](https://scanpy.readthedocs.io/en/latest/installation.html).
+#### python/conda
 ```bash
-# from scanpy's website
+# Install scanpy https://scanpy.readthedocs.io/en/latest/installation.html
 conda install seaborn scikit-learn statsmodels numba pytables
 conda install -c conda-forge python-igraph leidenalg
 pip install scanpy
-```
 
-```bash
-# these are required by dandelion
-conda install -c conda-forge distance joblib plotnine adjustText
+# skip if doing pre-processing via container
 conda install -c bioconda igblast blast # if this doesn't work, download them manually (see below)
 
-# installing rpy2
+# optional: installing rpy2 (if not doing pre-processing)
+# This is optional because it's only used for interaction with some of the R packages from the immcantation suite. Skip if prefer keeping it simple and run the different tools separately
 # if you just want to stick with the base R
-pip install "rpy2>=3.4"
-# or if you don't mind having conda manage R:
-conda install -c conda-forge "rpy2>=3.4"
+pip install "rpy2>=3.4" # or if you don't mind having conda manage R: conda install -c conda-forge "rpy2>=3.4"
 # make sure not to use the same R package folder or you will end up with major issues later.
 
 # Use pip to install the following with --no-cache-dir --upgrade if necessary
 # and then lastly install this
 pip install sc-dandelion
-# or
-pip install git+https://github.com/zktuong/dandelion.git
-
-# for the development branch, run this:
-pip install git+https://github.com/zktuong/dandelion.git@devel
+# or pip install git+https://github.com/zktuong/dandelion.git
+# for the development branch, run this: pip install git+https://github.com/zktuong/dandelion.git@devel
 ````
 
-`dandelion` also requires some R packages intalled.
+#### R
+If doing pre-preprocessing, `dandelion` requires some R packages intalled.
 ```R
 # in R
 install.packages(c("optparse", "alakazam", "tigger", "airr", "shazam"))
@@ -93,6 +104,7 @@ source ~/.bash_profile # or ~/.zshenv
 ```
 see https://github.com/zktuong/dandelion/issues/66 for a known issue if you are using a notebook via jupyterhub.
 
+This is already available in the singularity container under `/share/database/`.
 
 ## External softwares
 While blast and igblast executables are managed through conda, you can also download [igblast](https://ftp.ncbi.nih.gov/blast/executables/igblast/release/LATEST/) and [blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) manually, and store the softwares somewhere accessible. Just make sure to set the paths to them appropriately.
@@ -103,6 +115,8 @@ echo 'export PATH=~/Documents/software/bin:$PATH' >> ~/.bash_profile # or ~/.zsh
 source ~/.bash_profile # or ~/.zshenv
 ```
 
+This is already available in the singularity container under `/share/`.
+
 ## Basic requirements
 Python packages
 ```python
@@ -112,7 +126,7 @@ numpy>=1.18.4 (conda-forge)
 pandas>=1.0.3 (conda-forge)
 distance>=0.1.3 (conda-forge)
 joblib>=0.14.1 (conda-forge)
-jupyter (conda-forge)
+jupyter (conda-forge) # if running via a notebook
 scikit-learn>=0.23.0 (conda-forge)
 numba>=0.48.0 (conda-forge)
 pytables>=3.6.1 (conda-forge)
@@ -121,7 +135,7 @@ leidenalg>=0.8.0 (conda-forge)
 plotnine>=0.6.0 (conda-forge)
 
 # Other executables (through conda)
-blast>=2.10.0 (bioconda) # depends on the database version as well
+blast>=2.10.1 (bioconda)
 igblast>=1.15.0 (bioconda)
 
 # pip

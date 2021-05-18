@@ -7,6 +7,7 @@ From: continuumio/miniconda3
     ncbi-igblast-1.15.0 /share/ncbi-igblast-1.15.0
     database /share/database
     environment.yml /environment.yml
+    dandelion_preprocess.py /share/dandelion_preprocess.py
 
 %post
     apt-get -y update
@@ -27,6 +28,11 @@ From: continuumio/miniconda3
     export BLASTDB=/share/database/blast/
     export PATH=/share/ncbi-igblast-1.15.0/bin:$PATH
     export PATH=/share/ncbi-blast-2.10.1+/bin:$PATH
+    export PATH=/share:$PATH
+
+%runscript
+    alias dandelion-preprocess='dandelion_preprocess.py'
+    eval ${@}
 
 %test
     ls /share

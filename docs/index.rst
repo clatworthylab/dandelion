@@ -10,6 +10,7 @@ Welcome to dandelion's documentation!
    :maxdepth: 2
    :caption: Tutorial:
 
+   notebooks/singularity_preprocessing.ipynb
    notebooks/1_dandelion_preprocessing-10x_data.ipynb
    notebooks/2_dandelion_filtering-10x_data.ipynb
    notebooks/1b_dandelion_noreannotation-10x_data.ipynb   

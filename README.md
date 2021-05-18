@@ -37,10 +37,16 @@ The raw files for the examples can be downloaded from 10X's Single Cell Immune P
 `dandelion` now comes ready in the form of a singularity container:
 ```bash
 singularity pull library://kt16/default/sc-dandelion:latest
-singularity shell sc-dandelion.sif
+singularity shell sc-dandelion_latest.sif
 ```
 This will load up a conda-environment that has all the required dependencies installed.
-This can be used for the preprocessing steps. For the exploration steps, please install follow the instructions below.
+This can be used for the preprocessing steps by navigating to the data folder and use:
+```bash
+singularity run -B $PWD sc-dandelion_latest.sif dandelion-preprocess
+```
+Please refer to the [documentation](https://sc-dandelion.readthedocs.io/) for more information.
+
+For more fine control, as well as for the exploration steps, please install via following the instructions below.
 
 ### Manual
 I would reccomend installing this in order:
@@ -106,7 +112,7 @@ source ~/.bash_profile # or ~/.zshenv
 ```
 see https://github.com/zktuong/dandelion/issues/66 for a known issue if you are using a notebook via jupyterhub.
 
-This is already available in the container under `/share/database/`.
+This is already available in the singularity container under `/share/database/`.
 
 ## External softwares
 While blast and igblast executables are managed through conda, you can also download [igblast](https://ftp.ncbi.nih.gov/blast/executables/igblast/release/LATEST/) and [blast+](https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/) manually, and store the softwares somewhere accessible. Just make sure to set the paths to them appropriately.
@@ -117,7 +123,7 @@ echo 'export PATH=~/Documents/software/bin:$PATH' >> ~/.bash_profile # or ~/.zsh
 source ~/.bash_profile # or ~/.zshenv
 ```
 
-This is already available in the container under `/share/`.
+This is already available in the singularity container under `/share/`.
 
 ## Basic requirements
 Python packages
