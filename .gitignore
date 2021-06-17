@@ -5,7 +5,14 @@
 *-checkpoint.ipynb
 */dist/
 *__pycache__
+*.pytest_cache
 *scmtag.py
-dist/*
-sc_dandelion.egg-info/*
+*dist
+*sc_dandelion.egg-info
+*.coverage
+*.coverage*
 dandelion/logging/version.py
+tests/test_local.py
+tests/reassigned_all/
+tests/reassigned_filtered/
+tests/test_local_tr.py

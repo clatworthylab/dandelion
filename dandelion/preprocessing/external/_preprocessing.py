@@ -2,7 +2,7 @@
 # @Author: kt16
 # @Date:   2020-05-12 17:56:02
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-02-21 13:10:05
+# @Last Modified time: 2021-06-14 23:59:30
 
 import os
 import pandas as pd
@@ -50,7 +50,7 @@ def assigngenes_igblast(fasta: Union[str, PathLike], igblast_db: Union[None, str
         env['IGDATA'] = igblast_db
         igdb = env['IGDATA']
 
-    outfolder = os.path.abspath(os.path.dirname(fasta))+'/tmp'
+    outfolder = os.path.abspath(os.path.dirname(fasta)) + '/tmp'
     informat_dict = {'blast': '_igblast.fmt7', 'airr': '_igblast.tsv'}
     if not os.path.exists(outfolder):
         os.makedirs(outfolder)
@@ -99,13 +99,13 @@ def makedb_igblast(fasta: Union[str, PathLike], igblast_output: Union[None, str,
         except:
             raise OSError(
                 'Environmental variable GERMLINE must be set. Otherwise, please provide path to folder containing germline fasta files.')
-        gml = gml+'imgt/'+org+'/vdj/'
+        gml = gml + 'imgt/' + org + '/vdj/'
     else:
         env['GERMLINE'] = germline
         gml = germline
 
     if igblast_output is None:
-        indir = os.path.dirname(fasta)+'/tmp'
+        indir = os.path.dirname(fasta) + '/tmp'
         infile = os.path.basename(fasta).split('.fasta')[0] + '_igblast.fmt7'
         igbo = "{}/{}".format(indir, infile)
     else:
@@ -222,7 +222,7 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
         except:
             raise OSError(
                 'Environmental variable GERMLINE must be set. Otherwise, please provide path to folder containing germline fasta files.')
-        gml = gml+'imgt/'+org+'/vdj/'
+        gml = gml + 'imgt/' + org + '/vdj/'
     else:
         env['GERMLINE'] = germline
         gml = germline
@@ -242,8 +242,8 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                            '-d', db_file,
                            '-g', germ_type,
                            '--cloned',
-                           '-r', gml+'/imgt_'+org+'_IGHV.fasta', gml+'/imgt_' +
-                           org+'_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta',
+                           '-r', gml + '/imgt_' + org + '_IGHV.fasta', gml + '/imgt_' +
+                           org + '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -260,8 +260,8 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                            '-d', db_file,
                            '-g', germ_type,
                            '--cloned',
-                           '-r', genotype_fasta, gml+'/imgt_'+org +
-                           '_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta',
+                           '-r', genotype_fasta, gml + '/imgt_' + org +
+                           '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -280,8 +280,8 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                        '-d', db_file,
                        '-g', germ_type,
                        '--cloned',
-                       '-r', gml+'/imgt_'+org+'_IGKV.fasta', gml+'/imgt_'+org+'_IGKJ.fasta', gml +
-                       '/imgt_'+org+'_IGLV.fasta', gml+'/imgt_'+org+'_IGLJ.fasta',
+                       '-r', gml + '/imgt_' + org + '_IGKV.fasta', gml + '/imgt_' + org + '_IGKJ.fasta', gml +
+                       '/imgt_' + org + '_IGLV.fasta', gml + '/imgt_' + org + '_IGLJ.fasta',
                        '--vf', v_field
                        ]
             else:
@@ -301,9 +301,9 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                            '-d', db_file,
                            '-g', germ_type,
                            '--cloned',
-                           '-r', gml+'/imgt_'+org+'_IGHV.fasta', gml+'/imgt_'+org+'_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta', gml+'/imgt_' +
-                           org+'_IGKV.fasta', gml+'/imgt_'+org+'_IGKJ.fasta', gml +
-                               '/imgt_'+org+'_IGLV.fasta', gml+'/imgt_'+org+'_IGLJ.fasta',
+                           '-r', gml + '/imgt_' + org + '_IGHV.fasta', gml + '/imgt_' + org + '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta', gml + '/imgt_' +
+                           org + '_IGKV.fasta', gml + '/imgt_' + org + '_IGKJ.fasta', gml +
+                           '/imgt_' + org + '_IGLV.fasta', gml + '/imgt_' + org + '_IGLJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -320,9 +320,9 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                            '-d', db_file,
                            '-g', germ_type,
                            '--cloned',
-                           '-r', genotype_fasta, gml+'/imgt_'+org+'_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta', gml+'/imgt_'+org +
-                           '_IGKV.fasta', gml+'/imgt_'+org+'_IGKJ.fasta', gml+'/imgt_' +
-                           org+'_IGLV.fasta', gml+'/imgt_'+org+'_IGLJ.fasta',
+                           '-r', genotype_fasta, gml + '/imgt_' + org + '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta', gml + '/imgt_' + org +
+                           '_IGKV.fasta', gml + '/imgt_' + org + '_IGKJ.fasta', gml + '/imgt_' +
+                           org + '_IGLV.fasta', gml + '/imgt_' + org + '_IGLJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -342,8 +342,8 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                     cmd = ['CreateGermlines.py',
                            '-d', db_file,
                            '-g', germ_type,
-                           '-r', gml+'/imgt_'+org+'_IGHV.fasta', gml+'/imgt_' +
-                           org+'_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta',
+                           '-r', gml + '/imgt_' + org + '_IGHV.fasta', gml + '/imgt_' +
+                           org + '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -358,8 +358,8 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                     cmd = ['CreateGermlines.py',
                            '-d', db_file,
                            '-g', germ_type,
-                           '-r', genotype_fasta, gml+'/imgt_'+org +
-                           '_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta',
+                           '-r', genotype_fasta, gml + '/imgt_' + org +
+                           '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -376,8 +376,8 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                 cmd = ['CreateGermlines.py',
                        '-d', db_file,
                        '-g', germ_type,
-                       '-r', gml+'/imgt_'+org+'_IGKV.fasta', gml+'/imgt_'+org+'_IGKJ.fasta', gml +
-                       '/imgt_'+org+'_IGLV.fasta', gml+'/imgt_'+org+'_IGLJ.fasta',
+                       '-r', gml + '/imgt_' + org + '_IGKV.fasta', gml + '/imgt_' + org + '_IGKJ.fasta', gml +
+                       '/imgt_' + org + '_IGLV.fasta', gml + '/imgt_' + org + '_IGLJ.fasta',
                        '--vf', v_field
                        ]
             else:
@@ -395,9 +395,9 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                     cmd = ['CreateGermlines.py',
                            '-d', db_file,
                            '-g', germ_type,
-                           '-r', gml+'/imgt_'+org+'_IGHV.fasta', gml+'/imgt_'+org+'_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta', gml+'/imgt_' +
-                           org+'_IGKV.fasta', gml+'/imgt_'+org+'_IGKJ.fasta', gml +
-                               '/imgt_'+org+'_IGLV.fasta', gml+'/imgt_'+org+'_IGLJ.fasta',
+                           '-r', gml + '/imgt_' + org + '_IGHV.fasta', gml + '/imgt_' + org + '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta', gml + '/imgt_' +
+                           org + '_IGKV.fasta', gml + '/imgt_' + org + '_IGKJ.fasta', gml +
+                           '/imgt_' + org + '_IGLV.fasta', gml + '/imgt_' + org + '_IGLJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -412,9 +412,9 @@ def creategermlines(db_file: Union[str, PathLike], germtypes: Union[None, str] =
                     cmd = ['CreateGermlines.py',
                            '-d', db_file,
                            '-g', germ_type,
-                           '-r', genotype_fasta, gml+'/imgt_'+org+'_IGHD.fasta', gml+'/imgt_'+org+'_IGHJ.fasta', gml+'/imgt_'+org +
-                           '_IGKV.fasta', gml+'/imgt_'+org+'_IGKJ.fasta', gml+'/imgt_' +
-                           org+'_IGLV.fasta', gml+'/imgt_'+org+'_IGLJ.fasta',
+                           '-r', genotype_fasta, gml + '/imgt_' + org + '_IGHD.fasta', gml + '/imgt_' + org + '_IGHJ.fasta', gml + '/imgt_' + org +
+                           '_IGKV.fasta', gml + '/imgt_' + org + '_IGKJ.fasta', gml + '/imgt_' +
+                           org + '_IGLV.fasta', gml + '/imgt_' + org + '_IGLJ.fasta',
                            '--vf', v_field
                            ]
                 else:
@@ -459,10 +459,10 @@ def tigger_genotype(data: Union[str, PathLike], v_germline: Union[None, PathLike
             gml = env['GERMLINE']
         except:
             raise OSError('Environmental variable GERMLINE is not set. Please provide either the path to the folder containing the germline IGHV fasta file, or direct path to the germline IGHV fasta file.')
-        gml = gml+'imgt/'+org+'/vdj/imgt_'+org+'_IGHV.fasta'
+        gml = gml + 'imgt/' + org + '/vdj/imgt_' + org + '_IGHV.fasta'
     else:
         if os.path.isdir(v_germline):
-            gml = v_germline.rstrip('/') + 'imgt_'+org+'_IGHV.fasta'
+            gml = v_germline.rstrip('/') + 'imgt_' + org + '_IGHV.fasta'
             if not os.path.isfile(gml):
                 raise OSError("Input for germline is incorrect. Please rename IGHV germline file to '{}'. Otherwise, please provide path to folder containing the germline IGHV fasta file, or direct path to the germline IGHV fasta file.".format(gml))
         else:
@@ -496,7 +496,7 @@ def tigger_genotype(data: Union[str, PathLike], v_germline: Union[None, PathLike
         print(msg)
 
 
-def recipe_scanpy_qc(self: AnnData, max_genes: int = 2500, min_genes: int = 200, mito_cutoff: int = 5, pval_cutoff: float = 0.1, min_counts: Union[None, int] = None, max_counts: Union[None, int] = None, blacklist: Union[None, Sequence] = None) -> AnnData:
+def recipe_scanpy_qc(self: AnnData, mito_startswith: str = 'MT', max_genes: int = 2500, min_genes: int = 200, mito_cutoff: int = 5, pval_cutoff: float = 0.1, min_counts: Union[None, int] = None, max_counts: Union[None, int] = None, blacklist: Union[None, Sequence] = None, vdj_pattern: str = '^TR[AB][VDJ]|^IG[HKL][VDJC]') -> AnnData:
     """
     Recipe for running a standard scanpy QC workflow.
 
@@ -504,6 +504,8 @@ def recipe_scanpy_qc(self: AnnData, max_genes: int = 2500, min_genes: int = 200,
     ----------
     adata : AnnData
         annotated data matrix of shape n_obs × n_vars. Rows correspond to cells and columns to genes.
+    mito_startswith : str
+        string pattern used for searching mitochondrial genes.
     max_genes : int
         naximum number of genes expressed required for a cell to pass filtering. Default is 2500.
     min_genes : int
@@ -518,6 +520,8 @@ def recipe_scanpy_qc(self: AnnData, max_genes: int = 2500, min_genes: int = 200,
         maximum number of counts required for a cell to pass filtering. Default is None.
     blacklist : sequence, optional
         if provided, will exclude these genes from highly variable genes list.
+    vdj_pattern : str
+        string pattern for search VDJ genes to exclude from highly variable genes.
 
     Returns
     -------
@@ -535,16 +539,14 @@ def recipe_scanpy_qc(self: AnnData, max_genes: int = 2500, min_genes: int = 200,
     _adata.obs['scrublet_score'] = doublet_scores
     # overcluster prep. run basic scanpy pipeline
     sc.pp.filter_cells(_adata, min_genes=0)
-    mito_genes = _adata.var_names.str.startswith('MT-')
-    _adata.obs['percent_mito'] = np.sum(
-        _adata[:, mito_genes].X, axis=1) / np.sum(_adata.X, axis=1)*100
-    _adata.obs['n_counts'] = _adata.X.sum(axis=1)
+    _adata.var['mt'] = _adata.var_names.str.startswith(mito_startswith)
+    sc.pp.calculate_qc_metrics(_adata, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
     sc.pp.normalize_total(_adata, target_sum=1e4)
     sc.pp.log1p(_adata)
     sc.pp.highly_variable_genes(
         _adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
     for i in _adata.var.index:
-        if re.search('^TR[AB][VDJ]|^IG[HKL][VDJC]', i):
+        if re.search(vdj_pattern, i):
             _adata.var.at[i, 'highly_variable'] = False
         if blacklist is not None:
             if i in blacklist:
@@ -570,17 +572,17 @@ def recipe_scanpy_qc(self: AnnData, max_genes: int = 2500, min_genes: int = 200,
     # now compute doublet p-values. figure out the median and mad (from above-median values) for the distribution
     med = np.median(_adata.obs['scrublet_cluster_score'])
     mask = _adata.obs['scrublet_cluster_score'] > med
-    mad = np.median(_adata.obs['scrublet_cluster_score'][mask]-med)
+    mad = np.median(_adata.obs['scrublet_cluster_score'][mask] - med)
     # 1 sided test for catching outliers
     pvals = 1 - \
         scipy.stats.norm.cdf(
-            _adata.obs['scrublet_cluster_score'], loc=med, scale=1.4826*mad)
+            _adata.obs['scrublet_cluster_score'], loc=med, scale=1.4826 * mad)
     _adata.obs['scrublet_score_bh_pval'] = bh(pvals)
     # threshold the p-values to get doublet calls.
     _adata.obs['is_doublet'] = _adata.obs['scrublet_score_bh_pval'] < pval_cutoff
     _adata.obs['is_doublet'] = _adata.obs['is_doublet'].astype('category')
-    _adata.obs['filter_rna'] = (pd.Series([min_genes < n > max_genes for n in _adata.obs['n_genes']], index=_adata.obs.index)) | \
-        (_adata.obs['percent_mito'] >= mito_cutoff) | \
+    _adata.obs['filter_rna'] = (pd.Series([min_genes < n > max_genes for n in _adata.obs['n_genes_by_counts']], index=_adata.obs.index)) | \
+        (_adata.obs['pct_counts_mt'] >= mito_cutoff) | \
         (_adata.obs['is_doublet'] == True)
 
     # removing columns that probably don't need anymore

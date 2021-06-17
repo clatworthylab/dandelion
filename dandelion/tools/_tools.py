@@ -2,7 +2,7 @@
 # @Author: Kelvin
 # @Date:   2020-05-13 23:22:18
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-02-20 09:06:29
+# @Last Modified time: 2021-05-20 16:54:22
 
 import os
 import sys
@@ -50,7 +50,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
     key : str, optional
         column name for performing clone clustering. None defaults to 'junction_aa'.
     locus : str, optional
-        placeholder to allow for future tcr analysis mode for performing clustering. None defaults to 'bcr'.
+        placeholder to allow for future tcr analysis mode for performing clustering. None defaults to 'ig'.
     by_alleles : bool
         Whether or not to collapse alleles to genes. None defaults to False.
     key_added : str, optional
@@ -75,7 +75,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
     else:
         dat = dat_.copy()
 
-    locus_dict = {'bcr': 'IGH', 'BCR': 'IGH', 'ig': 'IGH'}
+    locus_dict = {'ig': 'IGH', 'tr-ab': 'TRB', 'tr-gd': 'TRG'}
 
     if key is None:
         key_ = 'junction_aa'  # default
@@ -90,8 +90,8 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
     else:
         locus_ = locus_dict[locus]
 
-    locus_log1_dict = {'IGH': 'IGH'}
-    locus_log2_dict = {'IGH': 'IGL/IGL'}
+    locus_log1_dict = {'IGH': 'IGH', 'TRB': 'TRB', 'TRD': 'TRD'}
+    locus_log2_dict = {'IGH': 'IGL/IGL', 'TRB': 'TRA', 'TRD': 'TRG'}
 
     dat_light = dat[~(dat['locus'] == locus_)].copy()
     dat_heavy = dat[dat['locus'] == locus_].copy()
@@ -133,7 +133,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
         seq_length = [len(str(l)) for l in dat_heavy[key_]]
     else:
         try:
-            seq_length = [l for l in dat_heavy[key_+'_length']]
+            seq_length = [l for l in dat_heavy[key_ + '_length']]
         except:
             raise ValueError("{} not found in {} input table.".format(
                 key_ + '_length', locus_log1_dict[locus_]))
@@ -165,14 +165,14 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
                         vj_len_grp[g][s][c] = seq[c]
     clones = Tree()
     # for each seq group, calculate the hamming distance matrix
-    for g in tqdm(seq_grp, desc='Finding clones based on heavy chains '):
+    for g in tqdm(seq_grp, desc='Finding clones based on VDJ chains '):
         for l in seq_grp[g]:
             seq_ = list(seq_grp[g][l])
             tdarray = np.array(seq_).reshape(-1, 1)
             d_mat = squareform(
                 pdist(tdarray, lambda x, y: hamming(x[0], y[0])))
             # then calculate what the acceptable threshold is for each length of sequence
-            tr = math.floor(int(l)*(1-identity))
+            tr = math.floor(int(l) * (1 - identity))
             # convert diagonal and upper triangle to zeroes
             d_mat = np.tril(d_mat)
             np.fill_diagonal(d_mat, 0)
@@ -283,7 +283,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
             if len(j_list3) > 0:
                 for c in range(0, len(j_list3)):
                     # the +2 here is so that the numbers come up after 1. It doesn't matter because i will reformat the clone ID numbers later
-                    clones[g][l][str(c+2)] = j_list3[c]
+                    clones[g][l][str(c + 2)] = j_list3[c]
 
     clone_dict = {}
     # now to retrieve the contig ids that are grouped together
@@ -301,21 +301,21 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
     for k1 in cid.keys():
         first_key.append(k1)
     first_key = list(set(first_key))
-    first_key_dict = dict(zip(first_key, range(1, len(first_key)+1)))
+    first_key_dict = dict(zip(first_key, range(1, len(first_key) + 1)))
     # and now for the middle key
     for g in cid:
         second_key = []
         for k2 in cid[g].keys():
             second_key.append(k2)
         second_key = list(set(second_key))
-        second_key_dict = dict(zip(second_key, range(1, len(second_key)+1)))
+        second_key_dict = dict(zip(second_key, range(1, len(second_key) + 1)))
         for l in cid[g]:
             # and now for the last key
             third_key = []
             for k3 in cid[g][l].keys():
                 third_key.append(k3)
             third_key = list(set(third_key))
-            third_key_dict = dict(zip(third_key, range(1, len(third_key)+1)))
+            third_key_dict = dict(zip(third_key, range(1, len(third_key) + 1)))
             for key, value in dict(cid[g][l]).items():
                 vL = []
                 for v in value:
@@ -323,7 +323,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
                         break
                     # instead of converting to another tree, i will just make it a dictionary
                     clone_dict[v] = str(
-                        first_key_dict[g])+'_'+str(second_key_dict[l])+'_'+str(third_key_dict[key])
+                        first_key_dict[g]) + '_' + str(second_key_dict[l]) + '_' + str(third_key_dict[key])
     # add it to the original dataframes
     dat_heavy[clone_key] = pd.Series(clone_dict)
     dat[clone_key] = pd.Series(dat_heavy[clone_key])
@@ -354,7 +354,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
         else:
             try:
                 seq_length = [len(str(l))
-                              for l in dat_light_c[key_+'_length']]
+                              for l in dat_light_c[key_ + '_length']]
             except:
                 raise ValueError("{} not found in {} input table.".format(
                     key_ + '_length', locus_log2_dict[locus_]))
@@ -390,7 +390,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
                 tdarray = np.array(seq_).reshape(-1, 1)
                 d_mat = squareform(
                     pdist(tdarray, lambda x, y: hamming(x[0], y[0])))
-                tr = math.floor(int(l)*(1-identity))
+                tr = math.floor(int(l) * (1 - identity))
                 d_mat = np.tril(d_mat)
                 np.fill_diagonal(d_mat, 0)
                 indices_temp = []
@@ -474,7 +474,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
                     clones_light[g][l][str(1)] = j_list2
                 if len(j_list3) > 0:
                     for c in range(0, len(j_list3)):
-                        clones_light[g][l][str(c+2)] = j_list3[c]
+                        clones_light[g][l][str(c + 2)] = j_list3[c]
         clone_dict_light = {}
         cid_light = Tree()
         for g in clones_light:
@@ -489,33 +489,33 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
             first_key.append(k1)
         first_key = list(set(first_key))
         first_key_dict = dict(
-            zip(first_key, range(1, len(first_key)+1)))
+            zip(first_key, range(1, len(first_key) + 1)))
         for g in cid_light:
             second_key = []
             for k2 in cid_light[g].keys():
                 second_key.append(k2)
             second_key = list(set(second_key))
             second_key_dict = dict(
-                zip(second_key, range(1, len(second_key)+1)))
+                zip(second_key, range(1, len(second_key) + 1)))
             for l in cid_light[g]:
                 third_key = []
                 for k3 in cid_light[g][l].keys():
                     third_key.append(k3)
                 third_key = list(set(third_key))
                 third_key_dict = dict(
-                    zip(third_key, range(1, len(third_key)+1)))
+                    zip(third_key, range(1, len(third_key) + 1)))
                 for key, value in dict(cid_light[g][l]).items():
                     vL = []
                     for v in value:
                         if type(v) is int:
                             break
                         clone_dict_light[v] = str(
-                            first_key_dict[g])+'_'+str(second_key_dict[l])+'_'+str(third_key_dict[key])
+                            first_key_dict[g]) + '_' + str(second_key_dict[l]) + '_' + str(third_key_dict[key])
         lclones = list(clone_dict_light.values())
         # will just update the main dat directly
         if len(list(set(lclones))) > 1:
             lclones_dict = dict(zip(sorted(list(set(lclones))), [
-                                str(x) for x in range(1, len(list(set(lclones)))+1)]))
+                                str(x) for x in range(1, len(list(set(lclones))) + 1)]))
         else:
             lclones_dict = dict(zip(sorted(list(set(lclones))), str(1)))
         renamed_clone_dict_light = {}
@@ -533,19 +533,19 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
             cellclonetree[c] = list(cellclonetree[c])
 
         fintree = Tree()
-        for c in tqdm(cellclonetree, desc='Refining clone assignment based on light chain pairing '):
+        for c in tqdm(cellclonetree, desc='Refining clone assignment based on VJ chain pairing '):
             suffix = [renamed_clone_dict_light[x]
                       for x in seqcellclonetree[c] if x in renamed_clone_dict_light]
             fintree[c] = []
             if len(suffix) > 1:
                 for s in suffix:
                     for cl in cellclonetree[c]:
-                        fintree[c].append(cl+'_'+s)
+                        fintree[c].append(cl + '_' + s)
                 fintree[c] = sorted(fintree[c])
             else:
                 for cl in cellclonetree[c]:
                     if len(suffix) > 0:
-                        fintree[c].append(cl+'_'+''.join(suffix))
+                        fintree[c].append(cl + '_' + ''.join(suffix))
                     else:
                         fintree[c].append(cl)
             fintree[c] = '|'.join(fintree[c])
@@ -590,17 +590,17 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
         if ('clone_id' in self.data.columns) and (key_added is None):
             # TODO: need to check the following bits if it works properly if only heavy chain tables are provided
             self.__init__(data=dat_, germline=germline_, distance=dist_,
-                          edges=edge_, layout=layout_, graph=graph_)
-            update_metadata(self, reinitialize=True)
+                          edges=edge_, layout=layout_, graph=graph_, locus = locus)
+            update_metadata(self, reinitialize=True, locus = locus)
         elif ('clone_id' in self.data.columns) and (key_added is not None):
             self.__init__(data=dat_, germline=germline_, distance=dist_,
-                          edges=edge_, layout=layout_, graph=graph_)
+                          edges=edge_, layout=layout_, graph=graph_, locus = locus)
             update_metadata(self, reinitialize=True, clone_key='clone_id',
-                            retrieve=clone_key, split=False, collapse=True, combine=True)
+                            retrieve=clone_key, split=False, collapse=True, combine=True, locus = locus)
         else:
             self.__init__(data=dat_, germline=germline_, distance=dist_, edges=edge_,
-                          layout=layout_, graph=graph_, clone_key=clone_key)
-            update_metadata(self, reinitialize=True, clone_key=clone_key)
+                          layout=layout_, graph=graph_, clone_key=clone_key, locus = locus)
+            update_metadata(self, reinitialize=True, clone_key=clone_key, locus = locus)
         self.threshold = threshold_
 
     else:
@@ -609,7 +609,7 @@ def find_clones(self: Union[Dandelion, pd.DataFrame], identity: float = 0.85, ke
         return(out)
 
 
-def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, neighbors_key: Union[None, str] = None, rna_key: Union[None, str] = None, bcr_key: Union[None, str] = None, overwrite: Union[None, bool, Sequence, str] = None) -> AnnData:
+def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, neighbors_key: Union[None, str] = None, rna_key: Union[None, str] = None, vdj_key: Union[None, str] = None, overwrite: Union[None, bool, Sequence, str] = None) -> AnnData:
     """
     Transfer data in `Dandelion` slots to `AnnData` object, updating the `.obs`, `.uns`, `.obsm` and `.obsp`slots.
 
@@ -625,8 +625,8 @@ def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, n
         key for 'neighbors' slot in `.uns`.
     rna_key : str, optional
         prefix for stashed RNA connectivities and distances.
-    bcr_key : str, optional
-        prefix for stashed BCR connectivities and distances.
+    vdj_key : str, optional
+        prefix for stashed VDJ connectivities and distances.
     overwrite : str, bool, list, optional
         Whether or not to overwrite existing anndata columns. Specifying a string indicating column name or list of column names will overwrite that specific column(s).
 
@@ -667,8 +667,8 @@ def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, n
             raise ValueError(
                 "`edges=True` requires `pp.neighbors` to be run before.")
 
-        rna_neighbors_key = 'rna_'+neighbors_key
-        bcr_neighbors_key = 'bcr_'+neighbors_key
+        rna_neighbors_key = 'rna_' + neighbors_key
+        vdj_neighbors_key = 'vdj_' + neighbors_key
         if rna_neighbors_key not in self.uns:
             self.uns[rna_neighbors_key] = self.uns[neighbors_key].copy()
 
@@ -683,12 +683,12 @@ def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, n
             r_connectivities_key = rna_key + '_connectivitites'
             r_distances_key = rna_key + '_distances'
 
-        if bcr_key is None:
-            b_connectivities_key = 'bcr_connectivities'
-            b_distances_key = 'bcr_distances'
+        if vdj_key is None:
+            b_connectivities_key = 'vdj_connectivities'
+            b_distances_key = 'vdj_distances'
         else:
-            b_connectivities_key = bcr_key + '_connectivitites'
-            b_distances_key = bcr_key + '_distances'
+            b_connectivities_key = vdj_key + '_connectivitites'
+            b_distances_key = vdj_key + '_distances'
 
         # stash_rna_connectivities:
         if r_connectivities_key not in self.obsp:
@@ -712,7 +712,7 @@ def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, n
         elif overwrite is True:
             self.obs[x] = pd.Series(dandelion.metadata[x])
         if type_check(dandelion.metadata, x):
-            self.obs[x].replace(np.nan, 'No_BCR', inplace=True)
+            self.obs[x].replace(np.nan, 'No_contig', inplace=True)
 
     if overwrite is not None and overwrite is not True:
         if not type(overwrite) is list:
@@ -720,7 +720,7 @@ def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, n
         for ow in overwrite:
             self.obs[ow] = pd.Series(dandelion.metadata[ow])
             if type_check(dandelion.metadata, ow):
-                self.obs[ow].replace(np.nan, 'No_BCR', inplace=True)
+                self.obs[ow].replace(np.nan, 'No_contig', inplace=True)
 
     tmp = self.obs.copy()
     if dandelion.layout is not None:
@@ -731,12 +731,12 @@ def transfer(self: AnnData, dandelion: Dandelion, expanded_only: bool = False, n
         for x in coord.columns:
             tmp[x] = coord[x]
         # tmp[[1]] = tmp[[1]]*-1
-        X_bcr = np.array(tmp[[0, 1]], dtype=np.float32)
-        self.obsm['X_bcr'] = X_bcr
+        X_vdj = np.array(tmp[[0, 1]], dtype=np.float32)
+        self.obsm['X_vdj'] = X_vdj
 
         logg.info(' finished', time=start,
                   deep=('updated `.obs` with `.metadata`\n'
-                        'added to `.uns[\''+neighbors_key+'\']` and `.obsp`\n'
+                        'added to `.uns[\'' + neighbors_key + '\']` and `.obsp`\n'
                         '   \'distances\', cluster-weighted adjacency matrix\n'
                         '   \'connectivities\', cluster-weighted adjacency matrix'))
     else:
@@ -1015,7 +1015,7 @@ def define_clones(self: Union[Dandelion, pd.DataFrame, str], dist: Union[None, f
             l_df.at[x, 'clone_id'] = linked_clones[l_df.loc[x, 'cell_id']]
         else:
             try:
-                l_df.at[x, 'clone_id'] = l_df.loc[x, 'cell_id']+'_notlinked'
+                l_df.at[x, 'clone_id'] = l_df.loc[x, 'cell_id'] + '_notlinked'
             except:
                 pass
 
@@ -1121,22 +1121,22 @@ def clone_size(self: Dandelion, max_size: Union[None, int] = None, clone_key: Un
 
     if max_size is not None:
         if key_added is None:
-            self.metadata[str(clonekey)+'_size_max_'+str(max_size)] = pd.Series(dict(zip(metadata_.index, [str(y) for y in [sorted(list(set([clonesize_dict[c_] for c_ in c.split('|')])),
-                                                                                                                                   key=lambda x: int(x.split('>= ')[1]) if type(x) is str else int(x), reverse=True)[0] if '|' in c else clonesize_dict[c] for c in metadata_[str(clonekey)]]])))
-            self.metadata[str(clonekey)+'_size_max_'+str(max_size)] = self.metadata[str(
-                clonekey)+'_size_max_'+str(max_size)].astype('category')
+            self.metadata[str(clonekey) + '_size_max_' + str(max_size)] = pd.Series(dict(zip(metadata_.index, [str(y) for y in [sorted(list(set([clonesize_dict[c_] for c_ in c.split('|')])),
+                                                                                                                                       key=lambda x: int(x.split('>= ')[1]) if type(x) is str else int(x), reverse=True)[0] if '|' in c else clonesize_dict[c] for c in metadata_[str(clonekey)]]])))
+            self.metadata[str(clonekey) + '_size_max_' + str(max_size)] = self.metadata[str(
+                clonekey) + '_size_max_' + str(max_size)].astype('category')
         else:
             self.metadata[key_added] = pd.Series(dict(zip(metadata_.index, [str(y) for y in [sorted(list(set([clonesize_dict[c_] for c_ in c.split('|')])), key=lambda x: int(
                 x.split('>= ')[1]) if type(x) is str else int(x), reverse=True)[0] if '|' in c else clonesize_dict[c] for c in metadata_[str(clonekey)]]])))
-            self.metadata[str(clonekey)+'_size_max_'+str(max_size)] = self.metadata[str(
-                clonekey)+'_size_max_'+str(max_size)].astype('category')
+            self.metadata[str(clonekey) + '_size_max_' + str(max_size)] = self.metadata[str(
+                clonekey) + '_size_max_' + str(max_size)].astype('category')
     else:
         if key_added is None:
-            self.metadata[str(clonekey)+'_size'] = pd.Series(dict(zip(metadata_.index, [str(y) for y in [sorted(list(set([clonesize_dict[c_] for c_ in c.split('|')])),
-                                                                                                                key=lambda x: int(x.split('>= ')[1]) if type(x) is str else int(x), reverse=True)[0] if '|' in c else clonesize_dict[c] for c in metadata_[str(clonekey)]]])))
+            self.metadata[str(clonekey) + '_size'] = pd.Series(dict(zip(metadata_.index, [str(y) for y in [sorted(list(set([clonesize_dict[c_] for c_ in c.split('|')])),
+                                                                                                                  key=lambda x: int(x.split('>= ')[1]) if type(x) is str else int(x), reverse=True)[0] if '|' in c else clonesize_dict[c] for c in metadata_[str(clonekey)]]])))
             try:
-                self.metadata[str(clonekey)+'_size'] = [int(x)
-                                                        for x in self.metadata[str(clonekey)+'_size']]
+                self.metadata[str(clonekey) + '_size'] = [int(x)
+                                                          for x in self.metadata[str(clonekey) + '_size']]
             except:
                 pass
         else:
@@ -1144,7 +1144,7 @@ def clone_size(self: Dandelion, max_size: Union[None, int] = None, clone_key: Un
                 x.split('>= ')[1]) if type(x) is str else int(x), reverse=True)[0] if '|' in c else clonesize_dict[c] for c in metadata_[str(clonekey)]]])))
             try:
                 self.metadata[key_added] = [
-                    int(x) for x in self.metadata[str(clonekey)+'_size']]
+                    int(x) for x in self.metadata[str(clonekey) + '_size']]
             except:
                 pass
     logg.info(' finished', time=start,
@@ -1191,7 +1191,7 @@ def clone_overlap(self: Union[Dandelion, AnnData], groupby: str, colorby: str, m
 
     # get rid of problematic rows that appear because of category conversion?
     data = data[~(data[clone_].isin(
-        [np.nan, 'nan', 'NaN', 'No_BCR', 'unassigned', None]))]
+        [np.nan, 'nan', 'NaN', 'No_contig', 'unassigned', None]))]
 
     # prepare a summary table
     datc_ = data[clone_].str.split('|', expand=True).stack()
@@ -1200,7 +1200,7 @@ def clone_overlap(self: Union[Dandelion, AnnData], groupby: str, colorby: str, m
     datc_.columns = ['cell_id', 'tmp', clone_]
     datc_.drop('tmp', inplace=True, axis=1)
     datc_ = datc_[~(datc_[clone_].isin(
-        ['', np.nan, 'nan', 'NaN', 'No_BCR', 'unassigned', None]))]
+        ['', np.nan, 'nan', 'NaN', 'No_contig', 'unassigned', None]))]
     dictg_ = dict(data[groupby])
     datc_[groupby] = [dictg_[l] for l in datc_['cell_id']]
 

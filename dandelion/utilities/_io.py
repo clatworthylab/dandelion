@@ -2,7 +2,7 @@
 # @Author: kt16
 # @Date:   2020-05-12 14:01:32
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-04-03 11:55:58
+# @Last Modified time: 2021-05-20 15:51:47
 
 import os
 import pandas as pd
@@ -145,9 +145,9 @@ def read_h5(filename: str = 'dandelion_data.h5') -> Dandelion:
         graph0 = nx.from_pandas_adjacency(g_0)
         graph1 = nx.from_pandas_adjacency(g_1)
         for u, v, d in graph0.edges(data=True):
-            d['weight'] = d['weight']-1
+            d['weight'] = d['weight'] - 1
         for u, v, d in graph1.edges(data=True):
-            d['weight'] = d['weight']-1
+            d['weight'] = d['weight'] - 1
         graph = (graph0, graph1)
     except:
         pass
@@ -174,7 +174,7 @@ def read_h5(filename: str = 'dandelion_data.h5') -> Dandelion:
         distance = Tree()
         try:
             for d in hf['distance'].keys():
-                d_ = pd.read_hdf(filename, 'distance/'+d)
+                d_ = pd.read_hdf(filename, 'distance/' + d)
                 distance[d] = scipy.sparse.csr_matrix(d_.values)
         except:
             pass
@@ -237,6 +237,14 @@ def read_10x_airr(file: str) -> Dandelion:
                 locus.append('IGK')
             elif all('IGL' in x for x in t if x == x):
                 locus.append('IGL')
+            elif all('TRA' in x for x in t if x == x):
+                locus.append('TRA')
+            elif all('TRB' in x for x in t if x == x):
+                locus.append('TRB')
+            elif all('TRD' in x for x in t if x == x):
+                locus.append('TRD')
+            elif all('TRG' in x for x in t if x == x):
+                locus.append('TRG')
             else:
                 locus.append(np.nan)
         dat['locus'] = locus
@@ -307,3 +315,69 @@ def from_scirpy(adata: AnnData, clone_key: Union[None, str] = None, key_added: U
         clonekey_d = key_added
 
     return(ir.io.to_dandelion(adata))
+
+
+def read_10x_vdj(path: str, filtered: bool = True):
+    """
+    A wrapper from scirpy to read 10x's .csv and .json files directly to be formatted in dandelion.
+
+    Parameters
+    ----------
+    path : str
+        Path to `filterd_contig_annotations.csv`, `all_contig_annotations.csv` or `all_contig_annotations.json`.
+    filtered : bool
+        Only keep filtered contig annotations (i.e. `is_cell` and `high_confidence`).
+        If using `filtered_contig_annotations.csv` already, this option is futile.
+    Returns
+    -------
+    `Dandelion` object.
+
+    """
+    try:
+        import scirpy as ir
+    except:
+        raise ImportError('Please install scirpy. pip install scirpy')
+
+    adata = ir.io.read_10x_vdj(path, filtered=filtered)
+
+    return(ir.io.to_dandelion(adata))
+
+
+def concat(arrays: Sequence[Union[pd.DataFrame, Dandelion]], check_unique: bool = True) -> Dandelion:
+    """
+    Concatenate dataframe and return as `Dandelion` object.
+
+    Parameters
+    ----------
+    arrays : Sequence
+        List of `Dandelion` class objects or pandas dataframe
+    check_unique : bool
+        Check the new index for duplicates. Otherwise defer the check until necessary. Setting to False will improve the performance of this method.
+
+    Returns
+    -------
+        `Dandelion` object
+    """
+    arrays = list(arrays)
+
+    try:
+        arrays_ = [x.data.copy() for x in arrays]
+    except:
+        arrays_ = [x.copy() for x in arrays]
+
+    if check_unique:
+        try:
+            df = pd.concat(arrays_, verify_integrity=True)
+        except:
+            for i in range(0, len(arrays)):
+                arrays_[i]['sequence_id'] = [x + '__' +
+                                             str(i) for x in arrays_[i]['sequence_id']]
+            arrays_ = [load_data(x) for x in arrays_]
+            df = pd.concat(arrays_, verify_integrity=True)
+    else:
+        df = pd.concat(arrays_)
+    try:
+        out = Dandelion(df)
+    except:
+        out = Dandelion(df, initialize=False)
+    return(out)

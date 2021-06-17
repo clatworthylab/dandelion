@@ -10,8 +10,9 @@ From: continuumio/miniconda3
     dandelion_preprocess.py /share/dandelion_preprocess.py
 
 %post
-    apt-get -y update
-    apt-get install -y libopenblas-dev r-base-core libcurl4-openssl-dev libopenmpi-dev openmpi-bin openmpi-common libxml2-dev openmpi-doc openssh-client openssh-server libssh-dev wget vim git nano git cmake  gfortran g++ curl wget autoconf bzip2 libtool libtool-bin
+    apt-get -y update && apt-get install -y curl r-base-core libcurl4-openssl-dev
+    R --slave -e 'install.packages("remotes", repos="https://cloud.r-project.org/")'
+    R --slave -e 'cat("apt-get update -y && apt-get install -y", paste(gsub("apt-get install -y ", "", remotes::system_requirements("ubuntu", "20.04", package = c("shazam","alakazam","tigger","airr","optparse","Biostrings","GenomicAlignments","IRanges","BiocManager","RCurl","XML"))), collapse = " "))'
 
     # Install required R packages
     R --slave -e 'install.packages("BiocManager", repos="https://cloud.r-project.org/")'
@@ -21,6 +22,7 @@ From: continuumio/miniconda3
     conda env update --name dandelion -f environment.yml
     echo ". /opt/conda/etc/profile.d/conda.sh" >> $SINGULARITY_ENVIRONMENT
     echo "conda activate dandelion" >> $SINGULARITY_ENVIRONMENT
+    apt-get autoremove
 
 %environment
     export GERMLINE=/share/database/germlines/
@@ -29,6 +31,7 @@ From: continuumio/miniconda3
     export PATH=/share/ncbi-igblast-1.15.0/bin:$PATH
     export PATH=/share/ncbi-blast-2.10.1+/bin:$PATH
     export PATH=/share:$PATH
+    export NUMBA_CACHE_DIR=$PWD/dandelion_cache
 
 %runscript
     alias dandelion-preprocess='dandelion_preprocess.py'

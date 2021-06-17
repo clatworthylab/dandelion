@@ -2,7 +2,7 @@
 # @Author: Kelvin
 # @Date:   2020-08-13 21:08:53
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-04-01 10:01:56
+# @Last Modified time: 2021-05-20 14:05:38
 
 import pandas as pd
 import numpy as np
@@ -53,7 +53,7 @@ def clone_rarefaction(self: Union[Dandelion, AnnData], groupby: str, clone_key: 
         clonekey = clone_key
 
     groups = list(set(metadata[groupby]))
-    metadata = metadata[metadata['bcr_QC_pass'].isin([True, 'True'])]
+    metadata = metadata[metadata['contig_QC_pass'].isin([True, 'True'])]
     metadata[clonekey] = metadata[clonekey].cat.remove_unused_categories()
     res = {}
     for g in groups:
@@ -428,7 +428,7 @@ def diversity_gini(self: Union[Dandelion, AnnData], groupby: str, metric: Union[
                                 _tab.drop(np.nan, inplace=True)
                         if met == 'clone_network':
                             sizelist.append(
-                                _dat[met+'_cluster_size_gini'].mean())
+                                _dat[met + '_cluster_size_gini'].mean())
                         elif met == 'clone_size':
                             clonesizecounts = np.array(_tab)
                             clonesizecounts = clonesizecounts[clonesizecounts > 0]
@@ -462,7 +462,7 @@ def diversity_gini(self: Union[Dandelion, AnnData], groupby: str, metric: Union[
 
                         if met == 'clone_network':
                             graphlist.append(
-                                _dat[met+'_vertex_size_gini'].mean())
+                                _dat[met + '_vertex_size_gini'].mean())
                         else:
                             # vertex closeness centrality or weighted degree distribution
                             # only calculate for expanded clones. If including non-expanded clones, the centrality is just zero which doesn't help.
@@ -479,15 +479,15 @@ def diversity_gini(self: Union[Dandelion, AnnData], groupby: str, metric: Union[
                                 g_c = 0
                             graphlist.append(g_c)
                 try:
-                    g_c = sum(sizelist)/len(sizelist)
+                    g_c = sum(sizelist) / len(sizelist)
                 except:
                     g_c = 0
 
                 res1.update({g: g_c})
                 if 'graphlist' in locals():
-                    g_c = sum(graphlist)/len(graphlist)
+                    g_c = sum(graphlist) / len(graphlist)
                     try:
-                        g_c = sum(graphlist)/len(graphlist)
+                        g_c = sum(graphlist) / len(graphlist)
                     except:
                         g_c = 0
                     res2.update({g: g_c})
@@ -546,9 +546,9 @@ def diversity_gini(self: Union[Dandelion, AnnData], groupby: str, metric: Union[
                             res1.update({g: pd.Series(g_c_c_res).mean()})
                         else:
                             res2.update(
-                                {g: _dat[met+'_vertex_size_gini'].mean()})
+                                {g: _dat[met + '_vertex_size_gini'].mean()})
                             res1.update(
-                                {g: _dat[met+'_cluster_size_gini'].mean()})
+                                {g: _dat[met + '_cluster_size_gini'].mean()})
                     else:
                         # vertex closeness centrality or weighted degree distribution
                         # only calculate for expanded clones. If including non-expanded clones, the centrality is just zero which doesn't help.
@@ -712,7 +712,7 @@ def diversity_chao1(self: Union[Dandelion, AnnData], groupby: str, clone_key: Un
                         g_c = 0
                     sizelist.append(g_c)
                 try:
-                    g_c = sum(sizelist)/len(sizelist)
+                    g_c = sum(sizelist) / len(sizelist)
                 except:
                     g_c = 0
                 res1.update({g: g_c})
@@ -895,7 +895,7 @@ def diversity_shannon(self: Union[Dandelion, AnnData], groupby: str, clone_key: 
                             g_c = 0
                     sizelist.append(g_c)
                 try:
-                    g_c = sum(sizelist)/len(sizelist)
+                    g_c = sum(sizelist) / len(sizelist)
                 except:
                     g_c = 0
                 res1.update({g: g_c})
@@ -1009,7 +1009,7 @@ def chooseln(N, k):
     R's lchoose in python
     from https://stackoverflow.com/questions/21767690/python-log-n-choose-k
     '''
-    return gammaln(N+1) - gammaln(N-k+1) - gammaln(k+1)
+    return gammaln(N + 1) - gammaln(N - k + 1) - gammaln(k + 1)
 
 
 def rarefun(y, sample):

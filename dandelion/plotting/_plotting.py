@@ -2,7 +2,7 @@
 # @Author: Kelvin
 # @Date:   2020-05-18 00:15:00
 # @Last Modified by:   Kelvin
-# @Last Modified time: 2021-02-20 09:44:55
+# @Last Modified time: 2021-05-20 14:21:45
 
 import seaborn as sns
 import pandas as pd
@@ -24,6 +24,7 @@ from itertools import combinations
 from typing import Union, Sequence, Tuple, Dict
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from tqdm import tqdm
 
 
 def clone_rarefaction(self: Union[AnnData, Dandelion], color: str, clone_key: Union[None, str] = None, palette: Union[None, Sequence] = None, figsize: Tuple[Union[int, float], Union[int, float]] = (6, 4), save: Union[None, str] = None) -> ggplot:
@@ -60,7 +61,7 @@ def clone_rarefaction(self: Union[AnnData, Dandelion], color: str, clone_key: Un
         clonekey = clone_key
 
     groups = list(set(metadata[color]))
-    metadata = metadata[metadata['bcr_QC_pass'].isin([True, 'True'])]
+    metadata = metadata[metadata['contig_QC_pass'].isin([True, 'True'])]
     metadata[clonekey] = metadata[clonekey].cat.remove_unused_categories()
     res = {}
     for g in groups:
@@ -100,7 +101,7 @@ def clone_rarefaction(self: Union[AnnData, Dandelion], color: str, clone_key: Un
     if palette is None:
         if self.__class__ == AnnData:
             try:
-                pal = self.uns[str(color)+'_colors']
+                pal = self.uns[str(color) + '_colors']
             except:
                 if len(list(set((pred.variable)))) <= 20:
                     pal = palettes.default_20
@@ -164,7 +165,7 @@ def clone_rarefaction(self: Union[AnnData, Dandelion], color: str, clone_key: Un
              + labs(color=color)
              + geom_line())
     if save:
-        p.save(filename='figures/rarefaction'+str(save),
+        p.save(filename='figures/rarefaction' + str(save),
                height=plt.rcParams['figure.figsize'][0], width=plt.rcParams['figure.figsize'][1], units='in', dpi=plt.rcParams["savefig.dpi"])
 
     return(p)
@@ -179,7 +180,7 @@ def random_palette(n: int) -> Sequence:
     return(palette)
 
 
-def clone_network(adata: AnnData, basis: str = 'bcr', edges: bool = True, **kwargs) -> Union[Figure, Axes, None]:
+def clone_network(adata: AnnData, basis: str = 'vdj', edges: bool = True, **kwargs) -> Union[Figure, Axes, None]:
     """
     Using scanpy's plotting module to plot the network. Only thing that is changed is the dfault options: `basis = 'bcr'` and `edges = True`.
 
@@ -188,7 +189,7 @@ def clone_network(adata: AnnData, basis: str = 'bcr', edges: bool = True, **kwar
     adata : AnnData
         AnnData object.
     basis : str
-        key for embedding. Default is 'bcr'.
+        key for embedding. Default is 'vdj'.
     edges : bool
         whether or not to plot edges. Default is True.
     **kwargs
@@ -262,7 +263,7 @@ def barplot(self: Union[AnnData, Dandelion], color: str, palette: str = 'Set1', 
     sns.barplot(x='index', y=color, data=res, palette=palette, **kwargs)
     # change some parts
     if title is None:
-        ax.set_title(color.replace('_', ' ')+' usage')
+        ax.set_title(color.replace('_', ' ') + ' usage')
     else:
         ax.set_title(title)
     if normalize:
@@ -381,7 +382,7 @@ def stackedbarplot(self: Union[AnnData, Dandelion], color: str, groupby: Union[N
                          **kwargs)  # make bar plots
         h, l = ax.get_legend_handles_labels()  # get the handles we want to modify
         for i in range(0, n_df * n_col, n_col):  # len(h) = n_col * n_df
-            for j, pa in enumerate(h[i:i+n_col]):
+            for j, pa in enumerate(h[i:i + n_col]):
                 for rect in pa.patches:  # for each index
                     rect.set_x(rect.get_x() + 1 / float(n_df + 1)
                                * i / float(n_col))
@@ -488,7 +489,7 @@ def spectratype(self: Union[AnnData, Dandelion], color: str, groupby: str, locus
     dat_[color] = pd.to_numeric(dat_[color], errors='coerce')
     dat_.sort_values(by=color)
     dat_2 = dat_.pivot(index=color, columns=groupby, values='value')
-    new_index = range(0, int(dat_[color].max())+1)
+    new_index = range(0, int(dat_[color].max()) + 1)
     dat_2 = dat_2.reindex(new_index, fill_value=0)
 
     def _plot_spectra_stacked(dfall: pd.DataFrame, labels: Union[None, Sequence] = None, figsize: Tuple[Union[int, float], Union[int, float]] = (6, 4), title: str = "multiple stacked bar plot", width: Union[None, Union[int, float]] = None, xtick_rotation: Union[None, Union[float, int]] = None, legend_options: Tuple[str, Tuple[float, float], int] = None, hide_legend: bool = True, H: Literal["/"] = "/", **kwargs) -> Tuple[Figure, Axes]:
@@ -498,7 +499,7 @@ def spectratype(self: Union[AnnData, Dandelion], color: str, groupby: str, locus
         n_col = len(dfall[0].columns)
         n_ind = len(dfall[0].index)
         if width is None:
-            wdth = 0.1 * n_ind/60+0.8
+            wdth = 0.1 * n_ind / 60 + 0.8
         else:
             wdth = width
         # Initialize the matplotlib figure
@@ -513,7 +514,7 @@ def spectratype(self: Union[AnnData, Dandelion], color: str, groupby: str, locus
                          **kwargs)  # make bar plots
         h, l = ax.get_legend_handles_labels()  # get the handles we want to modify
         for i in range(0, n_df * n_col, n_col):  # len(h) = n_col * n_df
-            for j, pa in enumerate(h[i:i+n_col]):
+            for j, pa in enumerate(h[i:i + n_col]):
                 for rect in pa.patches:  # for each index
                     rect.set_x(rect.get_x() + 1 / float(n_df + 1)
                                * i / float(n_col))
@@ -608,7 +609,7 @@ def clone_overlap(self: Union[AnnData, Dandelion], groupby: str, colorby: str, m
         data = self.obs.copy()
         # get rid of problematic rows that appear because of category conversion?
         data = data[~(data[clone_].isin(
-            [np.nan, 'nan', 'NaN', 'No_BCR', 'unassigned', None]))]
+            [np.nan, 'nan', 'NaN', 'No_contig', 'unassigned', None]))]
         if 'clone_overlap' in self.uns:
             overlap = self.uns['clone_overlap'].copy()
         else:
@@ -619,7 +620,7 @@ def clone_overlap(self: Union[AnnData, Dandelion], groupby: str, colorby: str, m
             datc_.columns = ['cell_id', 'tmp', clone_]
             datc_.drop('tmp', inplace=True, axis=1)
             datc_ = datc_[~(datc_[clone_].isin(
-                ['', np.nan, 'nan', 'NaN', 'No_BCR', 'unassigned', None]))]
+                ['', np.nan, 'nan', 'NaN', 'No_contig', 'unassigned', None]))]
             dictg_ = dict(data[groupby])
             datc_[groupby] = [dictg_[l] for l in datc_['cell_id']]
 
@@ -639,7 +640,7 @@ def clone_overlap(self: Union[AnnData, Dandelion], groupby: str, colorby: str, m
         data = self.metadata.copy()
         # get rid of problematic rows that appear because of category conversion?
         data = data[~(data[clone_].isin(
-            [np.nan, 'nan', 'NaN', 'No_BCR', 'unassigned', None]))]
+            [np.nan, 'nan', 'NaN', 'No_contig', 'unassigned', None]))]
 
         # prepare a summary table
         datc_ = data[clone_].str.split('|', expand=True).stack()
@@ -684,7 +685,7 @@ def clone_overlap(self: Union[AnnData, Dandelion], groupby: str, colorby: str, m
             if pd.api.types.is_categorical_dtype(self.obs[groupby]):
                 try:
                     colorby_dict = dict(zip(
-                        list(self.obs[str(colorby)].cat.categories), self.uns[str(colorby)+'_colors']))
+                        list(self.obs[str(colorby)].cat.categories), self.uns[str(colorby) + '_colors']))
                 except:
                     pass
     else:

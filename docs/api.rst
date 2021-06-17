@@ -9,7 +9,7 @@ Preprocessing: `pp`
    assign_isotypes
    calculate_threshold
    create_germlines
-   filter_bcr
+   filter_contigs
    format_fasta
    format_fastas
    quantify_mutations
@@ -76,6 +76,7 @@ Utilities: `utl`
    read_h5
    read_pkl
    read_10x_airr
+   read_10x_vdj
    update_metadata
    concat
    to_scirpy

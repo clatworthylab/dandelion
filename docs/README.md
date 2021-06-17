@@ -4,6 +4,7 @@
 ![master](https://github.com/zktuong/dandelion/workflows/tests/badge.svg?branch=master)
 [![](https://byob.yarr.is/zktuong/dandelion/devel-version)](https://github.com/zktuong/dandelion/tree/devel)
 ![tests](https://github.com/zktuong/dandelion/workflows/tests/badge.svg?branch=devel)
+[![codecov](https://codecov.io/gh/zktuong/dandelion/branch/master/graph/badge.svg?token=661BMU1FBO)](https://codecov.io/gh/zktuong/dandelion)
 
 ![](notebooks/img/dandelion_logo_illustration.png)
 
